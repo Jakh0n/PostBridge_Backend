@@ -21,9 +21,19 @@ export function validate(chains: ValidationChain[]) {
 }
 
 export const createParcelRules: ValidationChain[] = [
+  body("role")
+    .isIn(["sender", "courier"])
+    .withMessage("role must be sender or courier"),
   body("from").trim().notEmpty().withMessage("from is required"),
   body("to").trim().notEmpty().withMessage("to is required"),
   body("parcelType").trim().notEmpty().withMessage("parcelType is required"),
+  body("weightKg")
+    .optional({ nullable: true, checkFalsy: true })
+    .isFloat({ min: 0 })
+    .withMessage("weightKg must be a non-negative number"),
+  body("date").optional().isString().trim(),
+  body("availableDate").optional().isString().trim(),
+  body("vehicleType").optional().isString().trim(),
   body("price")
     .isFloat({ min: 0 })
     .withMessage("price must be a non-negative number"),
@@ -33,6 +43,11 @@ export const createParcelRules: ValidationChain[] = [
   body("contact.telegram").optional().isString().trim(),
   body().custom((_value, { req }) => {
     const bodyData = req.body as {
+      role?: "sender" | "courier";
+      weightKg?: number;
+      date?: string;
+      availableDate?: string;
+      vehicleType?: string;
       contact?: { phone?: string; telegram?: string };
     };
     const phone = bodyData.contact?.phone?.trim();
@@ -40,6 +55,24 @@ export const createParcelRules: ValidationChain[] = [
     if (!phone && !telegram) {
       throw new Error("Provide contact.phone and/or contact.telegram");
     }
+
+    if (bodyData.role === "sender") {
+      if (!bodyData.date?.trim()) {
+        throw new Error("date is required for sender posts");
+      }
+      if (
+        typeof bodyData.weightKg !== "number" ||
+        !Number.isFinite(bodyData.weightKg) ||
+        bodyData.weightKg < 0
+      ) {
+        throw new Error("weightKg is required for sender posts");
+      }
+    }
+
+    if (bodyData.role === "courier" && !bodyData.availableDate?.trim()) {
+      throw new Error("availableDate is required for courier posts");
+    }
+
     return true;
   }),
 ];

@@ -7,9 +7,14 @@ export interface ParcelContact {
 }
 
 export interface ParcelAttrs {
+  role: "sender" | "courier";
   from: string;
   to: string;
   parcelType: string;
+  weightKg?: number;
+  date?: string;
+  availableDate?: string;
+  vehicleType?: string;
   price: number;
   contact: ParcelContact;
   description?: string;
@@ -29,9 +34,19 @@ const contactSchema = new Schema<ParcelContact>(
 
 const parcelSchema = new Schema<ParcelDoc>(
   {
+    role: {
+      type: String,
+      required: true,
+      enum: ["sender", "courier"],
+      trim: true,
+    },
     from: { type: String, required: true, trim: true },
     to: { type: String, required: true, trim: true },
     parcelType: { type: String, required: true, trim: true },
+    weightKg: { type: Number, min: 0, default: null },
+    date: { type: String, trim: true, default: "" },
+    availableDate: { type: String, trim: true, default: "" },
+    vehicleType: { type: String, trim: true, default: "" },
     price: { type: Number, required: true, min: 0 },
     contact: {
       type: contactSchema,
