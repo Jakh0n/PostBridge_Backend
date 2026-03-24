@@ -15,20 +15,8 @@ import {
 const router = Router();
 
 router.get("/", asyncHandler(listParcels));
-router.post(
-  "/",
-  validate(createParcelRules),
-  asyncHandler(createParcel)
-);
-router.get(
-  "/:id",
-  validate(parcelIdParam),
-  asyncHandler(getParcelById)
-);
-router.delete(
-  "/:id",
-  validate(parcelIdParam),
-  asyncHandler(deleteParcel)
-);
+router.post("/", validate(createParcelRules), asyncHandler(createParcel));
+router.get("/:id", validate(parcelIdParam), asyncHandler(getParcelById));
+router.delete("/:id", validate(parcelIdParam), asyncHandler(deleteParcel));
 
 export default router;

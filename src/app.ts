@@ -5,13 +5,15 @@ import { errorHandler } from "./middleware/errorHandler.js";
 
 const app = express();
 
-const origins = process.env.CORS_ORIGIN?.split(",").map((o) => o.trim()).filter(Boolean);
+const origins = process.env.CORS_ORIGIN?.split(",")
+  .map((o) => o.trim())
+  .filter(Boolean);
 
 app.use(
   cors({
     origin: origins?.length ? origins : true,
     credentials: true,
-  })
+  }),
 );
 app.use(express.json({ limit: "1mb" }));
 
